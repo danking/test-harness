@@ -7,12 +7,11 @@ if [ ! -n "$PDA" ]; then
 else
     PDA=${PDA:1} # cut off the '
     if [ $# -eq 2 ]; then
-        DIR=`dirname $2`
-        echo '#! /usr/bin/env racket
-#lang racket
-(require (file "'$PWD'/macros.rkt")
-         (file "'$PWD'/../../pda-to-pda-risc/macro-glue.rkt"))
-(pda->racket "'$PWD'/'$1'" '$PDA')
+        DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+        echo '#lang racket
+(require (file "'$DIR'/macros.rkt")
+         (file "'$DIR'/../../pda-to-pda-risc/macro-glue.rkt"))
+(pda->racket "'$1'" '$PDA')
 (define (str->list s)
   (map (λ (x) (let ((num (string->number x)))
                 (if num num (string->symbol x))))
@@ -25,8 +24,9 @@ else
                (display (format "~a~n" (parser l)))))
                (loop)))
 (loop)
-' > $2
-        chmod u+x $2
+' > $2.rkt
+        raco exe $2.rkt
+        rm $2.rkt
         exit 0
     else
         echo 'Usage: racket->exe procs.procs out'

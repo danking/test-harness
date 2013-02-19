@@ -1,7 +1,8 @@
 #!/bin/bash
 
+DIR=`dirname $0`
 if [ $# -eq 3 ]; then
-    cat $1 | ./cfg-\>pda | ./pda-\>exe $2 $3
+    cat $1 | $DIR/cfg-\>pda | $DIR/pda-\>exe $2 $3
     exit 0
 else
     echo 'Usage: cfg->exe grammar.cfg token-convert.procs out'

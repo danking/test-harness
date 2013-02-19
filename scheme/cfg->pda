@@ -1,9 +1,10 @@
 #!/bin/sh
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 read -d '' CFG
 
 SCSH_PRE="> > > "
-OUT=`echo ",config ,load ../../optimizing-pda-compiler/src/lalr-package.scm
+OUT=`echo ",config ,load $DIR/../../optimizing-pda-compiler/src/lalr-package.scm
 ,open lalr
 (compile+convert-to-pda $CFG)
 (exit)
@@ -12,7 +13,7 @@ PDA=${OUT:44:$((${#OUT}-47))}
 if [ ${PDA:0:1} = '(' ] && # starts and ends with parens
    [ ${PDA:$((${#PDA}-1)):${#PDA}} = ')' ]; then
     echo '#lang racket
-(require (file "macros.rkt"))
+(require (file "'$DIR'/macros.rkt"))
 (pda-term->pda '$PDA')' > test.rkt
     racket -t test.rkt
     rm test.rkt
