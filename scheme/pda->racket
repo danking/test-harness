@@ -1,0 +1,19 @@
+#!/bin/bash
+
+DATAPDA=''
+PROCS=''
+FILE=''
+read -d '' DATAPDA
+if [ -n "$DATAPDA" ]; then
+   PROCS=$(cat $1)
+   FILE=$2
+else
+   DATAPDA=$1
+   PROCS=$(cat $2)
+   FILE=$3
+fi
+echo '#lang racket
+(require (file "../../pda-to-pda-risc/macro-glue.rkt"))
+(define parser (pda '$PROCS' '${DATAPDA:1}'))
+(provide parser)
+' > $FILE

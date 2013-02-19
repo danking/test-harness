@@ -1,0 +1,1 @@
+(lambda (x) (if (number? x) 'NUM 'PLUS)) car cdr empty?

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ $# -eq 2 ]; then
+    echo '#! /usr/bin/env racket
+#lang racket
+(require (file "'$1'"))
+(define (str->list s)
+  (map (λ (x) (let ((num (string->number x)))
+                (if num num (string->symbol x))))
+       (string-split s " ")))
+(define (loop)
+  (begin (let* ((s (read-line))
+                (l (str->list s)))
+           (if (zero? (length l))
+               (exit)
+               (display (format "~a~n" (parser l)))))
+         (loop)))
+(loop)
+' > $2
+    chmod u+x $2
+    exit 0
+else
+    echo 'Usage: racket->exe parser.rkt out'
+    exit 1
+fi
