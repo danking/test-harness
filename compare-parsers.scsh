@@ -3,8 +3,8 @@
 !#
 
 
-(define bison-executable-pf '(./bison/parser))
-(define scheme-executable-pf '(./scheme/parser))
+(define bison-executable-pf '(./bison/polish-notation-plus-only/parser))
+(define scheme-executable-pf '(./scheme/polish-notation-plus-only/parser))
 
 (define tests
   '(("3  + 4 + 5 * 6 + (3 + 5) * 4" (+ (+ (+ 3 4) (* 5 6)) (* (+ 3 5) 4)))
