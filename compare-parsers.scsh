@@ -1,0 +1,52 @@
+#!/usr/local/bin/scsh \
+-o srfi-1 -o srfi-28 -s
+!#
+
+
+(define bison-executable-pf '(./bison/parser))
+(define scheme-executable-pf '(./scheme/parser))
+
+(define tests
+  '(("3  + 4 + 5 * 6 + (3 + 5) * 4" (+ (+ (+ 3 4) (* 5 6)) (* (+ 3 5) 4)))
+    ("3 + 3" (+ 3 3))
+    ("3 + 3 * 5" (+ 3 (* 3 5)))
+    ("(3 + 3) * 5" (* (+ 3 3) 5))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define rest cdr)
+(define-syntax unless
+  (syntax-rules ()
+    ((_ conditional cnsq)
+     (if conditional
+         (void)
+         cnsq))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (run-parser test-string parser)
+  (run/sexp (| (echo ,test-string) ,parser)))
+
+(define (run-test test)
+  (let* ((test-string (first test))
+         (expected (second test))
+         (bison-result (run-parser test-string bison-executable-pf))
+         (scheme-result (run-scheme test-string scheme-executable-pf)))
+    (let ((expected&bison (equal? bison-result expected))
+          (expected&scheme (equal? scheme-result expected))
+          (bison&scheme (equal? bison-result scheme-result))))
+    (unless (and expected&bison expected&scheme bison&scheme)
+      (begin (display (format "test failed for ~s\n" (first (first tests))))
+             (display (format "  bison: ~s\n" bison-result))
+             (display (format "  scheme: ~s\n" scheme-result))
+             (display (format "  expected: ~s\n" expected))
+             (display (format "  e&b: ~a, e&s: ~a, b&s: ~a\n"
+                              expected&bison expected&scheme bison&scheme))))))
+
+(let (num-of-tests (length tests))
+  (let loop ((tests tests))
+    (if (null? tests)
+        (display (format "ran ~a tests\n" num-of-tests))
+        (begin (run-test (first tests))
+               (loop (rest tests))))))
