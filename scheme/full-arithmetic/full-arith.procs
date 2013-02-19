@@ -1,0 +1,11 @@
+((lambda (x) (if (number? x)
+                'NUM
+                (case x
+                  ((#\() 'L-PAREN)
+                  ((#\)) 'R-PAREN)
+                  ((+) 'PLUS)
+                  ((-) 'MINUS)
+                  ((*) 'TIMES)
+                  ((/) 'DIVIDE)
+                  (else 'LEXER-ERROR))))
+car cdr empty?)

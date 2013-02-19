@@ -1,1 +1,2 @@
 ./cfg-\>exe polish-notation-plus-only/plus-only-polish.cfg polish-notation-plus-only/plus-only-polish.procs polish
+./cfg-\>exe full-arithmetic/full-arith.cfg full-arithmetic/full-arith.procs arith
