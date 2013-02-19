@@ -35,7 +35,7 @@
   (let* ((test-string (first test))
          (expected (second test))
          (bison-result (run-parser test-string bison-executable-pf))
-         (scheme-result (run-scheme test-string scheme-executable-pf)))
+         (scheme-result (run-parser test-string scheme-executable-pf)))
     (let ((expected&bison (equal? bison-result expected))
           (expected&scheme (equal? scheme-result expected))
           (bison&scheme (equal? bison-result scheme-result)))
