@@ -1,7 +1,8 @@
 #lang racket
 
-(require (for-syntax racket/match))
-(provide pda-term->pda)
+(require (file "../../pda-to-pda-risc/macro-glue.rkt")
+         (for-syntax racket/file racket/match))
+(provide pda-term->pda pda->racket)
 
 (define-syntax (pda-term->pda stx)
   (define (list-of-len v n [a '()])
@@ -21,3 +22,13 @@
   (syntax-case stx ()
     ((_ clauses)
      #`'(#,@(pda-mod (syntax->datum #'clauses))))))
+
+(define-syntax (pda->racket stx)
+  (define (get-procs path)
+    (if (file-exists? path)
+        (file->value path #:mode 'text)
+        (error 'pda->racket (format "no such file: ~a~n" path))))
+  (syntax-case stx ()
+    ((_ file pda-data)
+     (let ((the-pda (syntax->datum #'pda-data)))
+       (datum->syntax stx `(define parser (pda ,@(get-procs (syntax->datum #'file)) ,the-pda)))))))

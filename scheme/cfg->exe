@@ -1,9 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 3 ]; then
-    TMP='parser.rkt'
-    cat $1 | ./cfg-\>pda | ./pda-\>racket $2 $TMP
-    ./racket-\>exe $TMP $3
+    cat $1 | ./cfg-\>pda | ./pda-\>exe $2 $3
     exit 0
 else
     echo 'Usage: cfg->exe grammar.cfg token-convert.procs out'

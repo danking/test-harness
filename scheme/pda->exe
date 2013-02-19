@@ -1,0 +1,34 @@
+#!/bin/bash
+
+read -d '' PDA
+if [ ! -n "$PDA" ]; then
+    echo "Expected a PDA term from STDIN."
+    exit 1
+else
+    PDA=${PDA:1} # cut off the '
+    if [ $# -eq 2 ]; then
+        echo '#! /usr/bin/env racket
+#lang racket
+(require (file "macros.rkt")
+         (file "../../pda-to-pda-risc/macro-glue.rkt"))
+(pda->racket "'$1'" '$PDA')
+(define (str->list s)
+  (map (λ (x) (let ((num (string->number x)))
+                (if num num (string->symbol x))))
+       (string-split s " ")))
+(define (loop)
+  (begin (let* ((s (read-line))
+                (l (str->list s)))
+           (if (zero? (length l))
+               (exit)
+               (display (format "~a~n" (parser l)))))
+               (loop)))
+(loop)
+' > $2
+        chmod u+x $2
+        exit 0
+    else
+        echo 'Usage: racket->exe procs.procs out'
+        exit 1
+    fi
+fi

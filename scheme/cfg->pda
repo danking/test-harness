@@ -12,7 +12,7 @@ PDA=${OUT:44:$((${#OUT}-47))}
 if [ ${PDA:0:1} = '(' ] && # starts and ends with parens
    [ ${PDA:$((${#PDA}-1)):${#PDA}} = ')' ]; then
     echo '#lang racket
-(require (file "pda-term->pda.rkt"))
+(require (file "macros.rkt"))
 (pda-term->pda '$PDA')' > test.rkt
     racket -t test.rkt
     rm test.rkt
