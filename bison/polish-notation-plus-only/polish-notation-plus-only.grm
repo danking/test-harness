@@ -1,0 +1,44 @@
+/* Polish notation calculator.  */
+
+%{
+  #include <stdio.h>
+  #include "data.h"
+  #include "unparser.h"
+  #include "data-creators.h"
+
+  /* Called by yyparse on error.  */
+  void
+  yyerror (char const *s)
+  {
+    fprintf (stderr, "%s\n", s);
+  }
+  int yylex (void);
+
+%}
+
+/* we can use %union in place of YYSTYPE */
+%union {
+  double num_u;
+  exp_holder* exp_u;
+}
+%token <num_u> NUM
+%type <exp_u> exp
+
+%% /* Grammar rules and actions follow.  */
+
+input:
+  /* empty */
+| input line
+;
+
+line:
+  '\n'
+  | exp '\n'      { unparse_exp($1); printf("\n"); free_exp($1); }
+;
+
+exp:
+NUM           { $$ = make_num($1); }
+  | '+' exp exp   { $$ = make_add('+', $2, $3); }
+;
+%%
+
