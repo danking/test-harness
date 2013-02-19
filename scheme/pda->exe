@@ -7,11 +7,12 @@ if [ ! -n "$PDA" ]; then
 else
     PDA=${PDA:1} # cut off the '
     if [ $# -eq 2 ]; then
+        DIR=`dirname $2`
         echo '#! /usr/bin/env racket
 #lang racket
-(require (file "macros.rkt")
-         (file "../../pda-to-pda-risc/macro-glue.rkt"))
-(pda->racket "'$1'" '$PDA')
+(require (file "'$PWD'/macros.rkt")
+         (file "'$PWD'/../../pda-to-pda-risc/macro-glue.rkt"))
+(pda->racket "'$PWD'/'$1'" '$PDA')
 (define (str->list s)
   (map (λ (x) (let ((num (string->number x)))
                 (if num num (string->symbol x))))
