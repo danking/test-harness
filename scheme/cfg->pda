@@ -8,18 +8,19 @@ OUT=`echo ",config ,load $DIR/../../optimizing-pda-compiler/src/lalr-package.scm
 ,open lalr
 (compile+convert-to-pda $CFG)
 (exit)
-" | scsh 2>/dev/null` # | grep "$SCSH_PRE"`
+" | scsh 2>/dev/null`
 PDA=${OUT:44:$((${#OUT}-47))}
-if [ ${PDA:0:1} = '(' ] && # starts and ends with parens
-   [ ${PDA:$((${#PDA}-1)):${#PDA}} = ')' ]; then
-    echo '#lang racket
+if [ ${#PDA} -gt '2' ]; then
+    if [ ${PDA:0:1} = '(' ] && # starts and ends with parens
+        [ ${PDA:$((${#PDA}-1)):${#PDA}} = ')' ]; then
+        echo '#lang racket
 (require (file "'$DIR'/macros.rkt"))
 (pda-term->pda '$PDA')' > test.rkt
-    racket -t test.rkt
-    rm test.rkt
-    exit 0
-else
-    echo $OUT
-    echo "An error occurred converting a grammar to a PDA."
-    exit 1
+        racket -t test.rkt
+        rm test.rkt
+        exit 0
+    fi
 fi
+echo $OUT
+echo "An error occurrect converting the given grammar to a PDA."
+exit 1

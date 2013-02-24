@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# need better lexer
+
 read -d '' PDA
 if [ ! -n "$PDA" ]; then
     echo "Expected a PDA term from STDIN."
@@ -13,9 +15,11 @@ else
          (file "'$DIR'/../../pda-to-pda-risc/macro-glue.rkt"))
 (pda->racket "'$1'" '$PDA')
 (define (str->list s)
-  (map (λ (x) (let ((num (string->number x)))
-                (if num num (string->symbol x))))
-       (string-split s " ")))
+  (if (eof-object? s)
+      (exit)
+      (map (λ (x) (let ((num (string->number x)))
+                    (if num num (string->symbol x))))
+           (string-split s " "))))
 (define (loop)
   (begin (let* ((s (read-line))
                 (l (str->list s)))
