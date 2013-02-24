@@ -3,48 +3,56 @@
 !#
 
 
-(define bison-executable-pf '(./bison/polish-notation-plus-only/parser))
-(define scheme-executable-pf '(./scheme/polish-notation-plus-only/parser))
+(define polish-bison "bison/polish-notation-plus-only/parser")
+(define polish-scheme "scheme/polish-notation-plus-only/parser")
 
-(define tests
-  ;; '(("3  + 4 + 5 * 6 + (3 + 5) * 4" (+ (+ (+ 3 4) (* 5 6)) (* (+ 3 5) 4)))
-  ;;   ("3 + 3" (+ 3 3))
-  ;;   ("3 + 3 * 5" (+ 3 (* 3 5)))
-  ;;   ("(3 + 3) * 5" (* (+ 3 3) 5)))
-  '(("+ 3 3" (+ 3 3))
-    ("+ + + 5 6 7 + 9 8" (+ (+ (+ 5 6) 7) (+ 9 8)))
-    ("+ 3 + 4 + 6 7" (+ 3 (+ 4 (+ 6 7))))))
+(define polish-tests
+  '(("+ 3 3\n" (+ 3 3))
+    ("+ + + 5 6 7 + 9 8\n" (+ (+ (+ 5 6) 7) (+ 9 8)))
+    ("+ 3 + 4 + 6 7\n" (+ 3 (+ 4 (+ 6 7))))))
+
+(define full-arithmetic-bison "bison/full-arithmetic/parser")
+(define full-arithmetic-scheme "scheme/full-arithmetic/parser")
+(define full-arithmetic-tests
+  '(("3  + 4 + 5 * 6 + (3 + 5) * 4\n" (+ (+ (+ 3 4) (* 5 6)) (* (+ 3 5) 4)))
+    ("3 + 3\n" (+ 3 3))
+    ("3 + 3 * 5\n" (+ 3 (* 3 5)))
+    ("(3 + 3) * 5\n" (* (+ 3 3) 5))))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define rest cdr)
+(define (run-tests tests bison-parser-path scheme-parser-path)
+ (define rest cdr)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (run-parser test-string parser)
-  (run/sexp (| (echo ,test-string) ,parser)))
+ (define (run-parser test-string parser)
+   (run/sexp (| (echo ,test-string) (,(string->symbol parser)))))
 
-(define (run-test test)
-  (let* ((test-string (first test))
-         (expected (second test))
-         (bison-result (run-parser test-string bison-executable-pf))
-         (scheme-result (run-parser test-string scheme-executable-pf)))
-    (let ((expected&bison (equal? bison-result expected))
-          (expected&scheme (equal? scheme-result expected))
-          (bison&scheme (equal? bison-result scheme-result)))
-      (if (and expected&bison expected&scheme bison&scheme)
-          (begin (display (format "test ~s passed\n" test-string)))
-          (begin (display (format "test failed for ~s\n" test-string))
-                 (display (format "  bison: ~s\n" bison-result))
-                 (display (format "  scheme: ~s\n" scheme-result))
-                 (display (format "  expected: ~s\n" expected))
-                 (display (format "  e&b: ~a, e&s: ~a, b&s: ~a\n"
-                                  expected&bison expected&scheme bison&scheme)))))))
+ (define (run-test test)
+   (let* ((test-string (first test))
+          (expected (second test))
+          (bison-result (run-parser test-string bison-parser-path))
+          (scheme-result (run-parser test-string scheme-parser-path)))
+     (let ((expected&bison (equal? bison-result expected))
+           (expected&scheme (equal? scheme-result expected))
+           (bison&scheme (equal? bison-result scheme-result)))
+       (if (and expected&bison expected&scheme bison&scheme)
+           (begin (display (format "test ~s passed\n" test-string)))
+           (begin (display (format "test failed for ~s\n" test-string))
+                  (display (format "  bison: ~s\n" bison-result))
+                  (display (format "  scheme: ~s\n" scheme-result))
+                  (display (format "  expected: ~s\n" expected))
+                  (display (format "  e&b: ~a, e&s: ~a, b&s: ~a\n"
+                                   expected&bison expected&scheme bison&scheme)))))))
 
-(let loop ((tests tests)
-           (num-of-tests 0))
-  (if (null? tests)
-      (display (format "ran ~a tests\n" num-of-tests))
-      (begin (run-test (first tests))
-             (loop (rest tests) (+ 1 num-of-tests)))))
+ (let loop ((tests tests)
+            (num-of-tests 0))
+   (if (null? tests)
+       (display (format "ran ~a tests\n" num-of-tests))
+       (begin (run-test (first tests))
+              (loop (rest tests) (+ 1 num-of-tests))))))
+
+;; (run-tests polish-tests polish-bison polish-scheme)
+(run-tests full-arithmetic-tests full-arithmetic-bison full-arithmetic-scheme)
